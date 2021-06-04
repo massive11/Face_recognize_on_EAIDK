@@ -72,8 +72,8 @@ int MainWindow::LoadConfig(ConfigParam &param,int batch)
 }
 
 MainWindow::MainWindow(QWidget *parent) :
-                       QMainWindow(parent),
-                       ui(new Ui::MainWindow)
+        QMainWindow(parent),
+        ui(new Ui::MainWindow)
 {
     img_length = 21;
     ui->setupUi(this);
@@ -84,15 +84,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(about, &QAction::triggered, this, [=]{QMessageBox::about(this, "Version", " Version:    1.0");});
 
     face_attr_enabled = false;
-	face_rec_enabled = false;
-	face_stereo_enabled = false;
+    face_rec_enabled = false;
+    face_stereo_enabled = false;
     face_track_enabled = false;
 
     this->cam = new Camera();
     video_base_path = "/sys/class/video4linux/video";
-	video_num = 0;
-	video_port.push_back(-1);
-	video_port.push_back(-1);
+    video_num = 0;
+    video_port.push_back(-1);
+    video_port.push_back(-1);
 
     //use socket or not
     ifstream file;
@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (file.fail())
     {
         printf("file open fail...");
-    }else{  
+    }else{
         std::string data;
         int cc = 0;
         while(getline(file,data)){
@@ -192,10 +192,10 @@ void MainWindow::updateImage()
     if(cam->srcImageL.data)
     {
         if (cam->srcImageL.cols != 0 && cam->srcImageL.rows!= 0)
-		{
+        {
             Mat ResImg = Mat(ResImgSiz, cam->srcImageL.type());
-        	if(face_rec_enabled)
-        	{
+            if(face_rec_enabled)
+            {
 
                 //face_rec->face_rec_run(cam->srcImageL);
                 algThd->setUseApiParams(0);
@@ -307,7 +307,7 @@ void MainWindow::updateImage()
                     ui->label_diku_2->show();
 
                     char faceinfostr[1024];
-                    sprintf(faceinfostr,"人脸识别：\n Age: %d\n Gender:%d\n Emotion:%d\n Position:x %d, y %d, w %d, h %d\n Quality: %f\n Score: %f\n Name: %s\n", \
+                    sprintf(faceinfostr,"人脸识别：\n 年龄: %d\n 性别:%d\n 情绪:%d\n Position:x %d, y %d, w %d, h %d\n 人脸质量: %f\n 识别概率: %f\n 姓名: %s\n", \
                             face_result.attr[0].age, face_result.attr[0].gender, face_result.attr[0].emotion, \
                             face_result.pos[0].x, face_result.pos[0].y, face_result.pos[0].width, face_result.pos[0].height, face_result.quality[0].score, \
                             face_result.score, face_result.name);
@@ -319,9 +319,9 @@ void MainWindow::updateImage()
                     ui->textEdit_info->clear();
                 }
 
-        	}
-        	else if(face_attr_enabled)
-        	{
+            }
+            else if(face_attr_enabled)
+            {
                 //face_attr->face_attr_run(cam->srcImageL);
                 algThd->setUseApiParams(1);
 
@@ -354,7 +354,7 @@ void MainWindow::updateImage()
                 char faceinfostr[5][1024];
                 QString qstrFace;
                 for(int i=0;i<face_result.num && i<5; i++){
-                    sprintf(faceinfostr[i], "第%d个人\n Age:%d Gender:%d Emotion:%d\n Position:x %d, y %d, w %d, h %d\n Quality: %f\n", \
+                    sprintf(faceinfostr[i], "第%d个人\n 年龄:%d 性别:%d 情绪:%d\n Position:x %d, y %d, w %d, h %d\n 人脸质量: %f\n", \
                             i+1, face_result.attr[i].age, face_result.attr[i].gender, face_result.attr[i].emotion, \
                             face_result.pos[i].x, face_result.pos[i].y, face_result.pos[i].width, face_result.pos[i].height, face_result.quality[i].score);
                     qstrFace += QString::fromUtf8(faceinfostr[i]);
@@ -394,7 +394,7 @@ void MainWindow::updateImage()
                 ui->textEdit_info->setText(QString::fromUtf8(faceinfostr));
 
             }
-		}
+        }
 
         cvtColor(cam->srcImageL, cam->srcImageL, CV_BGR2RGB);
         QImage imagel = QImage((uchar*)(cam->srcImageL.data), cam->srcImageL.cols, cam->srcImageL.rows, QImage::Format_RGB888);
@@ -411,41 +411,41 @@ void MainWindow::paintEvent(QPaintEvent *e)
 
 void MainWindow::open_camera()
 {
-	std::string file_name;
-	bool video_exist = false;
+    std::string file_name;
+    bool video_exist = false;
     int left = -1;
     int right = -1;
-	for (int i=0; i<=10; i++)
+    for (int i=0; i<=10; i++)
+    {
+        file_name = video_base_path;
+        file_name += to_string(i);
+        file_name += "/name";
+        video_exist = find_stereo_left_video(file_name);
+        if (video_exist)
         {
-                file_name = video_base_path;
-                file_name += to_string(i);
-                file_name += "/name";
-                video_exist = find_stereo_left_video(file_name);
-		if (video_exist)
-		{
-			//video_port[video_num] = i;
-			//video_num++;
-			left = i;
-		}
-
-                video_exist = find_stereo_right_video(file_name);
-		if (video_exist)
-		{
-			//video_port[video_num] = i;
-			//video_num++;
-			right = i;
-		}
-
-		//if (video_num == 2)
-		//	break;
+            //video_port[video_num] = i;
+            //video_num++;
+            left = i;
         }
 
-        if(cam->videoCapL.open(0))
-    	{
+        video_exist = find_stereo_right_video(file_name);
+        if (video_exist)
+        {
+            //video_port[video_num] = i;
+            //video_num++;
+            right = i;
+        }
 
-            cam->srcImageL = Mat::zeros(cam->videoCapL.get(CV_CAP_PROP_FRAME_HEIGHT), cam->videoCapL.get(CV_CAP_PROP_FRAME_WIDTH), CV_8UC3);
-            theTimer.start(33);
-    	}
+        //if (video_num == 2)
+        //	break;
+    }
+
+    if(cam->videoCapL.open(0))
+    {
+
+        cam->srcImageL = Mat::zeros(cam->videoCapL.get(CV_CAP_PROP_FRAME_HEIGHT), cam->videoCapL.get(CV_CAP_PROP_FRAME_WIDTH), CV_8UC3);
+        theTimer.start(33);
+    }
 }
 
 void MainWindow::close_camera()
@@ -456,7 +456,7 @@ void MainWindow::close_camera()
 void MainWindow::convert_to_face_attr()
 {
     if(ui->face_attr_2->isChecked()){
-    ui->regist->hide();
+        ui->regist->hide();
 //    ui->user_info->hide();
 
 //    ui->user_face_info1->hide();
@@ -465,13 +465,13 @@ void MainWindow::convert_to_face_attr()
 //    ui->user_face_info4->hide();
 //    ui->user_face_info5->hide();
 
-    face_attr_enabled = true;
-	face_rec_enabled = false;
-	face_stereo_enabled = false;
-    face_track_enabled = false;
+        face_attr_enabled = true;
+        face_rec_enabled = false;
+        face_stereo_enabled = false;
+        face_track_enabled = false;
 
-    cam->videoCapL.set(CV_CAP_PROP_FRAME_HEIGHT, NORMAL_FRAME_H);
-    cam->videoCapL.set(CV_CAP_PROP_FRAME_WIDTH, NORMAL_FRAME_W);
+        cam->videoCapL.set(CV_CAP_PROP_FRAME_HEIGHT, NORMAL_FRAME_H);
+        cam->videoCapL.set(CV_CAP_PROP_FRAME_WIDTH, NORMAL_FRAME_W);
     }
 }
 
@@ -479,16 +479,16 @@ void MainWindow::convert_to_face_rec()
 {
     if(ui->face_rec_2->isChecked()){
 
-    /* control hide and show */
-    ui->regist->show();
+        /* control hide and show */
+        ui->regist->show();
 
-    face_attr_enabled = false;
-	face_rec_enabled = true;
-	face_stereo_enabled = false;
-    face_track_enabled = false;
+        face_attr_enabled = false;
+        face_rec_enabled = true;
+        face_stereo_enabled = false;
+        face_track_enabled = false;
 
-    cam->videoCapL.set(CV_CAP_PROP_FRAME_HEIGHT, NORMAL_FRAME_H);
-    cam->videoCapL.set(CV_CAP_PROP_FRAME_WIDTH, NORMAL_FRAME_W);
+        cam->videoCapL.set(CV_CAP_PROP_FRAME_HEIGHT, NORMAL_FRAME_H);
+        cam->videoCapL.set(CV_CAP_PROP_FRAME_WIDTH, NORMAL_FRAME_W);
     }
 }
 
@@ -496,13 +496,13 @@ void MainWindow::convert_to_face_track()
 {
     if(ui->rb_face_track->isChecked()){
 
-    face_attr_enabled = false;
-    face_rec_enabled = false;
-    face_stereo_enabled = false;
-    face_track_enabled = true;
+        face_attr_enabled = false;
+        face_rec_enabled = false;
+        face_stereo_enabled = false;
+        face_track_enabled = true;
 
-    cam->videoCapL.set(CV_CAP_PROP_FRAME_HEIGHT, NORMAL_FRAME_H);
-    cam->videoCapL.set(CV_CAP_PROP_FRAME_WIDTH, NORMAL_FRAME_W);
+        cam->videoCapL.set(CV_CAP_PROP_FRAME_HEIGHT, NORMAL_FRAME_H);
+        cam->videoCapL.set(CV_CAP_PROP_FRAME_WIDTH, NORMAL_FRAME_W);
     }
 }
 
@@ -637,11 +637,11 @@ void MainWindow::user_regist_finish()
     face_rec_enabled = true;
 }
 
-char MainWindow::genRandom()  
+char MainWindow::genRandom()
 {
     static const char alphanum[] = "0123456789"
-                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                            "abcdefghijklmnopqrstuvwxyz";
+                                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                   "abcdefghijklmnopqrstuvwxyz";
     int stringLength = sizeof(alphanum) - 1;
 
     return alphanum[rand() % stringLength];
@@ -649,8 +649,8 @@ char MainWindow::genRandom()
 
 void MainWindow::gen()
 {
-	img_name = "";
-	srand(time(0));
+    img_name = "";
+    srand(time(0));
     for(int z=0; z < img_length; z++)
     {
         img_name += genRandom();
@@ -661,47 +661,47 @@ void MainWindow::gen()
 
 bool MainWindow::find_stereo_left_video(std::string file_name)
 {
-	//std::string video_name = "Stereo Vision 1";
-	std::string video_name = "Stereo Vision 2";
+    //std::string video_name = "Stereo Vision 1";
+    std::string video_name = "Stereo Vision 2";
 
-	ifstream fin(file_name, ios::in);
-	if(!fin)
-	{
-		return false;
-	}
-	char str[50];
-	fin.getline(str, 50);
+    ifstream fin(file_name, ios::in);
+    if(!fin)
+    {
+        return false;
+    }
+    char str[50];
+    fin.getline(str, 50);
 
-	fin.close();
+    fin.close();
 
-	if (video_name == str)
-	{
-		return true;
-	}
+    if (video_name == str)
+    {
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 bool MainWindow::find_stereo_right_video(std::string file_name)
 {
-	//std::string video_name = "Stereo Vision 2";
-	std::string video_name = "Stereo Vision 1";
+    //std::string video_name = "Stereo Vision 2";
+    std::string video_name = "Stereo Vision 1";
 
-	ifstream fin(file_name, ios::in);
-	if(!fin)
-	{
-		return false;
-	}
-	char str[50];
-	fin.getline(str, 50);
+    ifstream fin(file_name, ios::in);
+    if(!fin)
+    {
+        return false;
+    }
+    char str[50];
+    fin.getline(str, 50);
 
-	fin.close();
+    fin.close();
 
-	if (video_name == str)
-	{
-		return true;
-	}
+    if (video_name == str)
+    {
+        return true;
+    }
 
-	return false;
+    return false;
 }
 

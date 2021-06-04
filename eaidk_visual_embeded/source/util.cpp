@@ -108,7 +108,7 @@ string	Util::Double2String(double value, int length)
 			Result.append("0");
 		}
 	}
-        //printf("input value: %1.8f, %s\n", value, Result.c_str());
+	printf("input value: %1.8f, %s\n", value, Result.c_str());
 	return Result;
 }
 

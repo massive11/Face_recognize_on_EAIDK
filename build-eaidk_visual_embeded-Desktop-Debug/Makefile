@@ -35,7 +35,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = eaidk_visual_embeded1.0.0
-DISTDIR = /home/openailab/Desktop/eaidk310_face_demo/build-eaidk_visual_embeded-Desktop-Debug/.tmp/eaidk_visual_embeded1.0.0
+DISTDIR = /home/openailab/Desktop/eaidk310_face_demo_chinese/eaidk310_face_demo/build-eaidk_visual_embeded-Desktop-Debug/.tmp/eaidk_visual_embeded1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath-link,/usr/lib64
 LIBS          = $(SUBLIBS) /usr/lib64/libopencv_*.so /usr/local/AID/Tengine/lib/libtengine.so /usr/local/AID/Tengine/lib/libhclcpu.so ../libs/libface.so /usr/lib64/libpthread.so /usr/lib64/libfreetype.so -lQt5MultimediaWidgets -lQt5Multimedia -lQt5Widgets -lQt5Gui -lQt5Network -lQt5Core -lGL -lpthread 
@@ -455,12 +455,12 @@ moc_mainwindow.cpp: ../eaidk_visual_embeded/header/camera.h \
 		../eaidk_visual_embeded/mainwindow.h \
 		moc_predefs.h \
 		/usr/lib64/qt5/bin/moc
-	/usr/lib64/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/openailab/Desktop/eaidk310_face_demo/eaidk_visual_embeded -I/usr/include/freetype2 -I/usr/include/qt5 -I/usr/include/qt5/QtMultimediaWidgets -I/usr/include/qt5/QtMultimedia -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtNetwork -I/usr/include/qt5/QtCore -I. -I/usr/include/c++/8 -I/usr/include/c++/8/aarch64-redhat-linux -I/usr/include/c++/8/backward -I/usr/lib/gcc/aarch64-redhat-linux/8/include -I/usr/local/include -I/usr/include ../eaidk_visual_embeded/mainwindow.h -o moc_mainwindow.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/openailab/Desktop/eaidk310_face_demo_chinese/eaidk310_face_demo/eaidk_visual_embeded -I/usr/include/freetype2 -I/usr/include/qt5 -I/usr/include/qt5/QtMultimediaWidgets -I/usr/include/qt5/QtMultimedia -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtNetwork -I/usr/include/qt5/QtCore -I. -I/usr/include/c++/8 -I/usr/include/c++/8/aarch64-redhat-linux -I/usr/include/c++/8/backward -I/usr/lib/gcc/aarch64-redhat-linux/8/include -I/usr/local/include -I/usr/include ../eaidk_visual_embeded/mainwindow.h -o moc_mainwindow.cpp
 
 moc_camera.cpp: ../eaidk_visual_embeded/header/camera.h \
 		moc_predefs.h \
 		/usr/lib64/qt5/bin/moc
-	/usr/lib64/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/openailab/Desktop/eaidk310_face_demo/eaidk_visual_embeded -I/usr/include/freetype2 -I/usr/include/qt5 -I/usr/include/qt5/QtMultimediaWidgets -I/usr/include/qt5/QtMultimedia -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtNetwork -I/usr/include/qt5/QtCore -I. -I/usr/include/c++/8 -I/usr/include/c++/8/aarch64-redhat-linux -I/usr/include/c++/8/backward -I/usr/lib/gcc/aarch64-redhat-linux/8/include -I/usr/local/include -I/usr/include ../eaidk_visual_embeded/header/camera.h -o moc_camera.cpp
+	/usr/lib64/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib64/qt5/mkspecs/linux-g++ -I/home/openailab/Desktop/eaidk310_face_demo_chinese/eaidk310_face_demo/eaidk_visual_embeded -I/usr/include/freetype2 -I/usr/include/qt5 -I/usr/include/qt5/QtMultimediaWidgets -I/usr/include/qt5/QtMultimedia -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtNetwork -I/usr/include/qt5/QtCore -I. -I/usr/include/c++/8 -I/usr/include/c++/8/aarch64-redhat-linux -I/usr/include/c++/8/backward -I/usr/lib/gcc/aarch64-redhat-linux/8/include -I/usr/local/include -I/usr/include ../eaidk_visual_embeded/header/camera.h -o moc_camera.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -502,7 +502,8 @@ mainwindow.o: ../eaidk_visual_embeded/mainwindow.cpp ../eaidk_visual_embeded/mai
 		../eaidk_visual_embeded/source/thread.h \
 		../eaidk_visual_embeded/source/config.h \
 		../eaidk_visual_embeded/source/lock.h \
-		../eaidk_visual_embeded/source/util.h
+		../eaidk_visual_embeded/source/util.h \
+		../eaidk_visual_embeded/json.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../eaidk_visual_embeded/mainwindow.cpp
 
 camera.o: ../eaidk_visual_embeded/source/camera.cpp ../eaidk_visual_embeded/header/camera.h

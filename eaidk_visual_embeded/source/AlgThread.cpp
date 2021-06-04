@@ -1,18 +1,4 @@
 #include "AlgThread.h"
-#include <string>
-#include <sys/socket.h>
-#include <cstdio>
-#include <stdlib.h>
-
-
-#include "csignal"
-//#include "json.hpp"
-#include <arpa/inet.h>
-#include <cstdio>
-#include <netinet/in.h>
-#include <sys/socket.h>
-//using json = nlohmann::json;
-
 
 using namespace std;
 #ifdef FASTCV
@@ -26,27 +12,6 @@ void Thread::run(void *ptr) {
 	((AlgThread*)ptr)->run();
 }
 #endif
-
-
-//socket sendall
-//int SendAll(int &sock, unsigned char *data_sent, int data_len) {
-//  int sent_data_num;
-//  int remain_size = data_len;
-//  int point = 0;
-//  while (remain_size > 0) {
-//    sent_data_num = send(sock, data_sent, data_len, 0);
-//    remain_size = remain_size - sent_data_num;
-//    point += sent_data_num;
-//    printf("send %d bytes data, remain %d bytes data\n", sent_data_num,
-//           remain_size);
-//  }
-//  return point;
-//}
-//end socket sendall
-
-
-
-
 
 void AlgThread::sendFrame(Mat &mat, Mat &src)
 {
@@ -119,7 +84,6 @@ void AlgThread::FaceDemoInit(float a, float b, float c, float d, float factor, i
 #endif
 
 }
-
 int AlgThread::CompareFaceDB(float feature[])
 {
     float score=0;
@@ -140,13 +104,12 @@ int AlgThread::CompareFaceDB(float feature[])
         m_face.name = "unknown";
     }else{
         m_face.name=facedb[max_score.i].name;
-        //TODO 在这里发送识别成功的送入的特征值feature和存储的facedb[i].feature
     }
 #else
     const char *fname;
     faceapp::FaceQueryDB(mFace,feature,&score,&fname);
     m_face.score=score;
-    //printf("%s %d score:%f fname:%s, param.threshold:%f\n",__FUNCTION__, __LINE__, score, fname, param.threshold);
+    printf("%s %d score:%f fname:%s, param.threshold:%f\n",__FUNCTION__, __LINE__, score, fname, param.threshold);
     if (score>param.threshold) {
         max_score.score=score;
         max_score.i=0;
@@ -156,7 +119,7 @@ int AlgThread::CompareFaceDB(float feature[])
         m_face.name = "unknown";
     }
 #endif
-    //printf("%s %d max_score.i:%d\n", __FUNCTION__, __LINE__, max_score.i);
+    printf("%s %d max_score.i:%d\n", __FUNCTION__, __LINE__, max_score.i);
     return max_score.i;
 }
 
@@ -173,9 +136,8 @@ int AlgThread::FaceRecognize(char *name)
     getframe(mat);
     m_face.img_status=INITIALIZE;
     int face_recognize_return_value = FaceRecognize(mat,mat,0);
-    //printf("face_recognize_return_value:%d\n",face_recognize_return_value);
+    printf("face_recognize_return_value:%d\n",face_recognize_return_value);
     if(face_recognize_return_value/*FaceRecognize(mat,mat,0)*/==SUCCESS){
-        //mFace是用于检测的图片，feature1用于存储检测到的人脸特征信息
         int get_feature_result = faceapp::GetFeature(mFace, feature1, &res);
         if(get_feature_result/*faceapp::GetFeature(mFace,feature1,&res)*/==SUCCESS){
            index=Register(mat,feature1,name);
@@ -187,12 +149,12 @@ int AlgThread::FaceRecognize(char *name)
         else
         {
             return -1;
-            //printf("getfeature error....\n");
+            printf("getfeature error....\n");
         }
     }else{
         return -1;
         if (param.useapi!=1){
-          //printf("  fail to register %s (no face detect)\n",name);
+          printf("  fail to register %s (no face detect)\n",name);
         }
     }
 
@@ -212,7 +174,7 @@ int AlgThread::FaceRecognize(char *name)
             m_face.img_status=SAME_IMAGE;
             return 1;
         }
-        //printf("  ??? on %s and %s %f\n",name,facedb[index].name,score);
+        printf("  ??? on %s and %s %f\n",name,facedb[index].name,score);
         m_face.img_status=SIMILIAR_IMAGE;
     }
 #else
@@ -220,7 +182,7 @@ int AlgThread::FaceRecognize(char *name)
         if (strcmp(m_face.name,"unknown")==0){
             m_face.img_status=NEW_ADD_IMAGE;
             if (param.RegisterMethod==1) {
-                //printf("%s --nomatch\n",name);
+                printf("%s --nomatch\n",name);
             }
             return 0;
         }
@@ -229,9 +191,9 @@ int AlgThread::FaceRecognize(char *name)
             return 1;
         }
         if (param.RegisterMethod==1) {
-            //printf("%s --mismatch\n",name);
+            printf("%s --mismatch\n",name);
         }
-        //printf("  ??? on %s and %s %f\n",name,m_face.name,m_face.score);
+        printf("  ??? on %s and %s %f\n",name,m_face.name,m_face.score);
         m_face.img_status=SIMILIAR_IMAGE;
     }
 #endif
@@ -247,18 +209,6 @@ unsigned long long AlgThread::get_ms()
 
 void AlgThread::run()
 {
-    // create socket
-    //定义socket
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-
-  /*sockaddr_in serv_addr;
-  memset(&serv_addr, 0, sizeof(serv_addr));
-  serv_addr.sin_family = AF_INET;                     //使用IPv4地址
-  serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //具体的IP地址
-  serv_addr.sin_port = htons(1234);    */               //端口
-  //connect(sock, (sockaddr *)&serv_addr, sizeof(serv_addr));
-
-
     //struct timeval tv_start, tv_end,t0,t1;
     static unsigned long long tv_start, tv_end,t0,t1;
     float feature0[FEATURE_SIZE];
@@ -296,9 +246,9 @@ void AlgThread::run()
         {
             continue;
         }
-        //printf("%s %d face_recognize_return_value:%d\n", __FUNCTION__, __LINE__, face_recognize_return_value);
+        printf("%s %d face_recognize_return_value:%d\n", __FUNCTION__, __LINE__, face_recognize_return_value);
         if(face_recognize_return_value != SUCCESS){
-            //printf("%s %d face_recognize fail...\n", __FUNCTION__, __LINE__);
+            printf("%s %d face_recognize fail...\n", __FUNCTION__, __LINE__);
             t0=tv_start;
             if (param.useapi==2) {
                 //gettimeofday(&tv_end, NULL);
@@ -309,17 +259,15 @@ void AlgThread::run()
         }
         else
         {
-            //printf("%s %d face_recognize success...\n", __FUNCTION__, __LINE__);
+            printf("%s %d face_recognize success...\n", __FUNCTION__, __LINE__);
         }
         if(1 == param.useapi)
         {
             continue;
         }
-        //mFace是当前检测到的人脸图片
-        //GetFeature是获取特征值函数，提取检测到的人脸特征
         ret=faceapp::GetFeature(mFace,feature1,&res);
         if (ret!=SUCCESS) {
-            //printf("%s %d get feature fail....\n", __FUNCTION__, __LINE__);
+            printf("%s %d get feature fail....\n", __FUNCTION__, __LINE__);
             t0=tv_start;
             if(ret==ERROR_BAD_QUALITY)
                 m_face.name="unknown";
@@ -333,26 +281,11 @@ void AlgThread::run()
         }
 
         if(face_rec_label){
-            //printf("%s\n","-----------------success in Line 311");
-//            for (int i=0;i<FEATURE_SIZE;++i) {
-//                printf("%f ",feature1[i]);
-//            }
             ret = CompareFaceDB(feature1);
-            //printf("success in Line 316--------It is %s\n",m_face.name);
-            //socket
+            if(ret >= 0)
+            {
 
-            //printf("success in Line 320--------It is %s\n",m_face.name);
-            //向客户端发送数据
-            //json json_data;
-            //发送长度
-            //char image_data_length[7];
-            //sprintf(image_data_length, "%06d", image_size);
-
-            //int send_len_num = send(sock, image_data_length,
-                                    //6, 0);
-
-
-
+            }
         }
 //        faceapp::Compare(mFace,feature0, feature1, &score);
 //        printf("%s %d score:%f\n", __FUNCTION__, __LINE__, score);
@@ -447,21 +380,20 @@ void AlgThread::ShowRegister()
 //  0..MAX_FACE_SIZE-1 data index
 //  MAX_FACE_SIZE data is full
 //  face_id the next idex
-
 int AlgThread::Register(Mat &mat,float *feature,char *fname)
 {
-    //int ret;
+    int ret;
     char path[64];
     if (param.batchregist) {
         if (m_face.pos[0].width==0 || m_face.pos[0].height==0) {
             return -1;
         }
     }
-    int ret=CompareFaceDB(feature);
-    //printf("%s %d ret:%d\n", __FUNCTION__, __LINE__, ret);
-    //if (ret>=0) {
+    ret=CompareFaceDB(feature);
+    printf("%s %d ret:%d\n", __FUNCTION__, __LINE__, ret);
+    if (ret>=0) {
         //return ret;
-    //}
+    }
     if (param.RegisterMethod==1) {
         return face_id+1;
     }
@@ -534,9 +466,6 @@ int AlgThread::Register(Mat &mat,float *feature,char *fname)
     }
 #ifdef FASTCV
     fcv::resize(mat_tmp, rsmat, Size(120, 120), fcv::_INTER_LINEAR);
-
-
-
     sprintf(path, "./faces/%s.png", name);
     fcv::imwrite(String(path), rsmat);
 #else
@@ -638,7 +567,7 @@ int AlgThread::Tracker(Mat &mat,Mat &src)
 	}
     unsigned long long time_end = get_ms();
     m_fps = (float)(1000/(time_end - time_start));
-    //printf("-------------------------------DetectTrack time :%lld\n", time_end - time_start);
+    printf("-------------------------------DetectTrack time :%lld\n", time_end - time_start);
 	return SUCCESS;
 }
 
@@ -653,7 +582,7 @@ int AlgThread::FaceRecognize(Mat &mat,Mat &gray,int policy)
     int ret=ERROR_FAILURE;
 	bool detected = false;
     //m_face.num = 0;
-    //printf("%s %d param.useapi:%d\n", __FUNCTION__, __LINE__, param.useapi);
+    printf("%s %d param.useapi:%d\n", __FUNCTION__, __LINE__, param.useapi);
     switch (param.useapi) {
     default:
     case 0:
@@ -662,7 +591,7 @@ int AlgThread::FaceRecognize(Mat &mat,Mat &gray,int policy)
         ret=faceapp::DetectRecognize(mFace, faceapp::Image(&mat), policy, &res);
         unsigned long long time_end = get_ms();
         m_fps = (float)(1000/(time_end - time_start));
-        //printf("detect_recognize_time:%lld\n", time_end - time_start);
+        printf("detect_recognize_time:%lld\n", time_end - time_start);
         break;
     }
     case 2:
@@ -701,7 +630,7 @@ int AlgThread::FaceRecognize(Mat &mat,Mat &gray,int policy)
         ret=faceapp::Detect(mFace, faceapp::Image(&mat), &res);
         unsigned long long time_end = get_ms();
         m_fps = (float)(1000/(time_end - time_start));
-        //printf("detect_time:%lld\n", time_end - time_start);
+        printf("detect_time:%lld\n", time_end - time_start);
         break;
     }
     case 0x0a:
@@ -710,7 +639,7 @@ int AlgThread::FaceRecognize(Mat &mat,Mat &gray,int policy)
         ret=faceapp::DetectRecognize(mFace, faceapp::Image(&mat), policy, &res);
         unsigned long long time_end = get_ms();
         m_fps = (float)(1000/(time_end - time_start));
-        //printf("DetectRecognize_time:%lld\n", time_end - time_start);
+        printf("DetectRecognize_time:%lld\n", time_end - time_start);
         break;
     }
     case 0x0b:
@@ -720,7 +649,7 @@ int AlgThread::FaceRecognize(Mat &mat,Mat &gray,int policy)
         ret=faceapp::Detect(mFace, faceapp::Image(&mat), &res);
         faceapp::DetectLiveness(mFace, faceapp::Image(&mat), &res);
         unsigned long long time_end = get_ms();
-        //printf("Detectandliveness_time:%lld\n", time_end - time_start);
+        printf("Detectandliveness_time:%lld\n", time_end - time_start);
         break;
     }
 	case 3:
@@ -729,7 +658,7 @@ int AlgThread::FaceRecognize(Mat &mat,Mat &gray,int policy)
 	case 4:
 	    usleep(200000);
         //ret=faceapp::Recognize(mFace, faceapp::Image(&r_face.facemat), &r_face.ddata,&res);
-                //printf("---------------------------------------recognize\n");
+		printf("---------------------------------------recognize\n");
         break;
     }
     if (ret== SUCCESS) {
