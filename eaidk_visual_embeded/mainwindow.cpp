@@ -79,6 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     //ui->save_camera->setEnabled(0);
     //ui->close_camera->setEnabled(0);
+    // 添加一个动作
     QAction *about = new QAction("&About");
     ui->menuBar->addAction(about);
     connect(about, &QAction::triggered, this, [=]{QMessageBox::about(this, "Version", " Version:    1.0");});
@@ -130,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     /* connects */
+    // 绑定定时器
     connect(&theTimer, &QTimer::timeout, this, &MainWindow::updateImage);
 
     connect(ui->face_attr_2, SIGNAL(clicked(bool)), this, SLOT(convert_to_face_attr()));
